@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>跨轴瀑布图</title>
+    <script src="js/echarts.min.js"></script>
+</head>
+<body>
+    <div id="main" style="width: 600px;height:400px;"></div>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+
+        // last_final, chg, final
+        let mp = {
+            '111': {up: 'chg', down: '0', aid_v: 'last_final', aid_color: 'white'},
+            '101': {up: '0', down: '-chg', aid_v: 'final', aid_color: 'white'},
+            '100': {up: '0', down: 'final', aid_v: 'last_final', aid_color: 'down'},
+            // 110 不存在
+            '011': {up: 'final', down: '0', aid_v: 'last_final', aid_color: 'up'},
+            '010': {up: '-chg', down: '0', aid_v: 'final', aid_color: 'white'},
+            '000': {up: '0', down: 'chg', aid_v: 'last_final', aid_color: 'white'},
+            // 001 不存在
+        };
+        let data = [{v: -900, t:1}, {v: 1400, t:1}, {v: -700, t:1}, {v: 200, t:1}, {v: -200, t:1},];
+        let aid = [], up = [], down = [], zero = [];
+
+        // 当值>0时返回1，否则为0字符串
+        let ngFlag = (dt) => {
+            if(dt >= 0) {
+                return '1'
+            }
+            return '0'
+        }
+
+        // 通过key word返回值
+        let getValueByFlag = (key_word, last_final, chg, final_v) => {
+            if(key_word == '0') {
+                return 0
+            } else if(key_word == 'chg') {
+                return chg
+            } else if(key_word == '-chg') {
+                return -chg
+            } else if(key_word == 'final') {
+                return final_v
+            } else if(key_word == '-final') {
+                return -final_v
+            } else if(key_word == 'last_final') {
+                return last_final
+            } else if(key_word == '-last_final') {
+                return -last_finalw
+            }
+            return 0
+        }
+
+        let last_fanal_v = 0;
+        for (let i = 0; i < data.length; i++) {
+            let dt = data[i];
+            let up_v = dt;
+            let down_v = 0;
+            let zero_v = 0;
+            let ad = {v: 0, t: 0}; // green表示从0开始的，blue表示上升，red表示下降
+            // console.log('=============i %o===================', i);
+            if(dt.t == 0) {// 0起点
+                ad = {v: 0, t: 0};
+                up_v = 0;
+                down_v = 0;
+                zero_v = dt.v;
+                last_fanal_v = dt.v;
+            } else {
+                let org_aid_v = last_fanal_v;
+                let final_v = org_aid_v + dt.v;
+                // ad = {v:0,t:0,up_c:'green',aid_c:'white',down_c:'red'}
+                // console.log(upi-1 %o, org_aid_v %o, final_v %o, dt %o, up[i-1], org_aid_v, final_v, dt.v)
+                let ng_key = ngFlag(org_aid_v) + ngFlag(dt.v) + ngFlag(final_v);
+                let ng_val = mp[ng_key];
+                let chg = dt.v;
+                up_v = getValueByFlag(ng_val.up, org_aid_v, chg, final_v);
+                down_v = getValueByFlag(ng_val.down, org_aid_v, chg, final_v);
+                aid_v = getValueByFlag(ng_val.aid, org_aid_v, chg, final_v);
+                // let aid_c = ng_val.aid_color;
+                ad.v = aid_v;
+                // ad.aid_c = aid_c;
+                last_fanal_v = final_v;
+            }
+            // console.log(ad)
+            aid.push(ad);
+            up.push(up_v);
+            down.push(down_v);
+            zero.push(zero_v);
+        }
+        aid_data = aid.map(ad => ad.v);
+
+        let option = {
+            title: {
+                text: '跨轴瀑布图',
+                subtext: '嘿嘿嘿',
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                    type: 'shadow',
+                },
+                formatter: (params) => {
+                    let tar;
+                    let html = '';
+                    for (let i =1; i < params.length; i++) {
+                        let e = params[i];
+                        let _index = e.dataIndex;
+                        let _cVal = Math.abs(e.value);
+                        if (up[_index] >0 && aid_data[_index] < 0 && i === 1) {
+                            _cVal = Math.abs(up[_index]) + Math.abs(aid_data[_index]);
+                        }
+                    }
+                }
+            },
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        // myChart.setOption(option);
+    </script>
+</body>
+</html>
