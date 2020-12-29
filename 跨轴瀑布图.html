@@ -112,13 +112,137 @@
                         if (up[_index] >0 && aid_data[_index] < 0 && i === 1) {
                             _cVal = Math.abs(up[_index]) + Math.abs(aid_data[_index]);
                         }
+                        if (down[_index] < 0 && aid_data[_index] > 0 && i === 2) {
+                            _cVal = Math.abs(down[_index]) + Math.abs(aid_data[_index]);
+                        }
+                        html += e.name + ' ' + e.seriesName + ':' + _cVal + '<br/>';
                     }
+                    return html;
                 }
             },
+            legehd: {
+                data: ['支出', '收入', '零起点'],
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true,
+            },
+            xAxis: {
+                type: 'category',
+                splitLine: {show :false},
+                data: function() {
+                    let list = [];
+                    for (let i = 1; i <= data.length; i++) {
+                        list.push('11月' + i + '日');
+                    }
+                    return list;
+                }(),
+            },
+            yAxis: {
+                type: 'value',
+            },
+            series: [
+                {
+                    name: '辅助',
+                    type: 'bar',
+                    stack: '总量',
+                    label: {
+                        normal: {
+                            show: true,
+                            position: 'top',
+                            formatter(p) {
+                                // console.log('辅助', up[p.dataIndex], aid_data[p.dataIndex], down[p.dataIndex])
+                                if(up[p.dataIndex] === 0 && down[p.dataIndex] === 0) {
+                                    return Math.abs(p.value);
+                                }
+                                return '';
+                            },
+                        },
+                    },
+                    itemStyle: {
+                        normal: {
+                            color(p) {
+                                if(up[p.dataIndex] >= 0 && aid_data[p.dataIndex] < 0 && down[p.dataIndex] === 0) {
+                                    return '#c23531';
+                                }
+                                if(down[p.dataIndex] <= 0 && aid_data[p.dataIndex] > 0 && up[p.dataIndex] === 0) {
+                                    return '#2f4554';
+                                }
+                                return 'rgba(0, 0, 0, 0.1)';
+                            },
+                        },
+                    },
+                    data: aid_data,
+                },
+                {
+                    name: '收入',
+                    type: 'bar',
+                    stack: '总量',
+                    label: {
+                        normal: {
+                            show: true,
+                            position: 'top',
+                            formatter(p) {
+                                // console.log('收入', up[p.dataIndex], aid_data[p.dataIndex], down[p.dataIndex])
+                                if(up[p.dataIndex] > 0 && aid_data[p.dataIndex] < 0) {
+                                    return Math.abs(up[p.dataIndex]) + Math.abs(aid_data[p.dataIndex]);
+                                }
+                                if(Math.abs(up[p.dataIndex]) > 0) {
+                                    return Math.abs(up[p.dataIndex]);
+                                }
+                                return '';
+                            },
+                        },
+                    },
+                    data: up,
+                },
+                {
+                    name: '支出',
+                    type: 'bar',
+                    stack: '总量',
+                    label: {
+                        normal: {
+                            show: true,
+                            position: 'top',
+                            formatter(p) {
+                                // console.log('支出', up[p.dataIndex], aid_data[p.dataIndex], down[p.dataIndex])
+                                if(down[p.dataIndex] < 0 && aid_data[p.dataIndex] > 0) {
+                                    return Math.abs(down[p.dataIndex]) + Math.abs(aid_data[p.dataIndex]);
+                                }
+                                if(Math.abs(down[p.dataIndex]) > 0) {
+                                    return Math.abs(down[p.dataIndex]);
+                                }
+                                return '';
+                            },
+                        },
+                    },
+                    data: down,
+                },
+                {
+                    name: '零起点',
+                    type: 'bar',
+                    stack: '总量',
+                    label: {
+                        normal: {
+                            show: true,
+                            position: 'top',
+                            formatter(p) {
+                                if(zero[p.dataIndex] !== 0) {
+                                    return Math.abs(zero[p.dataIndex]);
+                                }
+                                return '';
+                            },
+                        },
+                    },
+                    data: zero,
+                }
+            ]
         };
 
         // 使用刚指定的配置项和数据显示图表。
-        // myChart.setOption(option);
+        myChart.setOption(option);
     </script>
 </body>
 </html>
