@@ -61,7 +61,7 @@
             let down_v = 0;
             let zero_v = 0;
             let ad = {v: 0, t: 0}; // green表示从0开始的，blue表示上升，red表示下降
-            // console.log('=============i %o===================', i);
+            console.log('=============i %o===================', i);
             if(dt.t == 0) {// 0起点
                 ad = {v: 0, t: 0};
                 up_v = 0;
@@ -72,13 +72,15 @@
                 let org_aid_v = last_fanal_v;
                 let final_v = org_aid_v + dt.v;
                 // ad = {v:0,t:0,up_c:'green',aid_c:'white',down_c:'red'}
-                // console.log(upi-1 %o, org_aid_v %o, final_v %o, dt %o, up[i-1], org_aid_v, final_v, dt.v)
+                // console.log('upi-1 %o, org_aid_v %o, final_v %o, dt %o', up[i-1], org_aid_v, final_v, dt.v)
                 let ng_key = ngFlag(org_aid_v) + ngFlag(dt.v) + ngFlag(final_v);
                 let ng_val = mp[ng_key];
+                console.log('ng_val', ng_val)
                 let chg = dt.v;
                 up_v = getValueByFlag(ng_val.up, org_aid_v, chg, final_v);
                 down_v = getValueByFlag(ng_val.down, org_aid_v, chg, final_v);
-                aid_v = getValueByFlag(ng_val.aid, org_aid_v, chg, final_v);
+                aid_v = getValueByFlag(ng_val.aid_v, org_aid_v, chg, final_v);
+                // console.log(up_v, down_v,aid_v);
                 // let aid_c = ng_val.aid_color;
                 ad.v = aid_v;
                 // ad.aid_c = aid_c;
@@ -102,23 +104,23 @@
                 axisPointer: { // 坐标轴指示器，坐标轴触发有效
                     type: 'shadow',
                 },
-                formatter: (params) => {
-                    let tar;
-                    let html = '';
-                    for (let i =1; i < params.length; i++) {
-                        let e = params[i];
-                        let _index = e.dataIndex;
-                        let _cVal = Math.abs(e.value);
-                        if (up[_index] >0 && aid_data[_index] < 0 && i === 1) {
-                            _cVal = Math.abs(up[_index]) + Math.abs(aid_data[_index]);
-                        }
-                        if (down[_index] < 0 && aid_data[_index] > 0 && i === 2) {
-                            _cVal = Math.abs(down[_index]) + Math.abs(aid_data[_index]);
-                        }
-                        html += e.name + ' ' + e.seriesName + ':' + _cVal + '<br/>';
-                    }
-                    return html;
-                }
+                // formatter: (params) => {
+                //     let tar;
+                //     let html = '';
+                //     for (let i =1; i < params.length; i++) {
+                //         let e = params[i];
+                //         let _index = e.dataIndex;
+                //         let _cVal = Math.abs(e.value);
+                //         if (up[_index] >0 && aid_data[_index] < 0 && i === 1) {
+                //             _cVal = Math.abs(up[_index]) + Math.abs(aid_data[_index]);
+                //         }
+                //         if (down[_index] < 0 && aid_data[_index] > 0 && i === 2) {
+                //             _cVal = Math.abs(down[_index]) + Math.abs(aid_data[_index]);
+                //         }
+                //         html += e.name + ' ' + e.seriesName + ':' + _cVal + '<br/>';
+                //     }
+                //     return html;
+                // }
             },
             legehd: {
                 data: ['支出', '收入', '零起点'],
@@ -165,10 +167,10 @@
                         normal: {
                             color(p) {
                                 if(up[p.dataIndex] >= 0 && aid_data[p.dataIndex] < 0 && down[p.dataIndex] === 0) {
-                                    return '#c23531';
+                                    return '#91cc75';
                                 }
                                 if(down[p.dataIndex] <= 0 && aid_data[p.dataIndex] > 0 && up[p.dataIndex] === 0) {
-                                    return '#2f4554';
+                                    return '#fac858';
                                 }
                                 return 'rgba(0, 0, 0, 0.1)';
                             },
